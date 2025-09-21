@@ -52,7 +52,7 @@ export default function IncidentTable() {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse border rounded shadow text-sm">
           <thead>
-            <tr className="bg-gray-200">
+            <tr className="bg-white text-black">
               <th className="p-2 border">Name</th>
               <th className="p-2 border">Email</th>
               <th className="p-2 border">Flat No.</th>
