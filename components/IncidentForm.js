@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 // Generate random 7-character alphanumeric incident code
 function generateIncidentCode() {
@@ -22,11 +22,12 @@ export default function IncidentForm({ onSubmit, initialData }) {
     impact: "",
     reportedTo: "",
     referenceNo: "",
-    incidentCode: generateIncidentCode(),
+    incidentCode: "",
   };
 
   const [form, setForm] = useState(initialData || emptyForm);
-  const [successMessage, setSuccessMessage] = useState("");
+  const [success, setSuccess] = useState(false);
+  const messageRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,17 +53,21 @@ export default function IncidentForm({ onSubmit, initialData }) {
       incidentCode: form.incidentCode || generateIncidentCode(),
     };
 
-    const success = await onSubmit(data);
-    if (success) {
-      setForm({
-        ...emptyForm,
-        incidentCode: generateIncidentCode(),
-      });
+    const result = await onSubmit(data);
 
-      setSuccessMessage(
-        `✅ Incident ${data.incidentCode} submitted successfully. Letting Agent Has been notified for remedial action.`
-      );
-      setTimeout(() => setSuccessMessage(""), 5000);
+    if (result) {
+      setSuccess(true);
+      setForm(initialData || emptyForm);
+
+      // Focus the success message so iPhone scrolls to it
+      setTimeout(() => {
+        if (messageRef.current) {
+          messageRef.current.focus();
+        }
+      }, 50);
+
+      // Hide after 10s
+      setTimeout(() => setSuccess(false), 10000);
     }
   };
 
@@ -74,7 +79,11 @@ export default function IncidentForm({ onSubmit, initialData }) {
     { name: "time", label: "Time", type: "time" },
     { name: "description", label: "Description of Incident", type: "text" },
     { name: "impact", label: "Impact on You / Household", type: "text" },
-    { name: "reportedTo", label: "Police involvement?", type: "text" },
+    {
+      name: "reportedTo",
+      label: "Police involvement?",
+      type: "text",
+    },
     { name: "referenceNo", label: "Police Reference No.", type: "text" },
   ];
 
@@ -83,25 +92,28 @@ export default function IncidentForm({ onSubmit, initialData }) {
       onSubmit={handleSubmit}
       className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md max-w-2xl mx-auto w-full"
     >
-      <h1 className="text-2xl mb-4 text-center">
-        <span className="text-red-700 dark:text-red-400 font-bold">Flat 4</span>
-      </h1>
-      <h2 className="text-xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">
-        Incident Report Form
-      </h2>
-
-      {successMessage && (
-        <div className="p-3 text-green-800 dark:text-green-100 bg-green-100 dark:bg-green-700 border border-green-300 dark:border-green-600 rounded">
-          {successMessage}
+      {success && (
+        <div
+          ref={messageRef}
+          tabIndex="-1"
+          className="p-3 mb-4 text-sm text-green-800 dark:text-green-200 bg-green-100 dark:bg-green-900 rounded"
+        >
+          ✅ Incident successfully submitted. Letting agent has been notified
+          for remedial action.
         </div>
       )}
+
+      <h1 className="text-2xl mb-4 text-center">
+        <span className="text-red-700 font-bold">Flat 4</span>
+      </h1>
+      <h2 className="text-xl font-bold mb-4 text-center">
+        Incident Report Form
+      </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {fields.map(({ name, label, type }) => (
           <div key={name} className="flex flex-col">
-            <label className="block font-medium text-sm mb-1 text-gray-900 dark:text-gray-100">
-              {label}
-            </label>
+            <label className="block font-medium text-sm mb-1">{label}</label>
             <input
               type={type}
               name={name}
@@ -118,11 +130,7 @@ export default function IncidentForm({ onSubmit, initialData }) {
                 "time",
                 "description",
               ].includes(name)}
-              className="w-full border px-3 py-2 rounded 
-                         focus:outline-none focus:ring focus:ring-blue-300
-                         bg-white dark:bg-gray-700 
-                         text-gray-900 dark:text-gray-100
-                         border-gray-300 dark:border-gray-600"
+              className="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             />
           </div>
         ))}
@@ -130,7 +138,7 @@ export default function IncidentForm({ onSubmit, initialData }) {
 
       <button
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
+        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
       >
         Submit
       </button>
