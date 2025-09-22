@@ -54,17 +54,15 @@ export default function IncidentForm({ onSubmit, initialData }) {
 
     const success = await onSubmit(data);
     if (success) {
-      // reset form and generate new code
       setForm({
         ...emptyForm,
         incidentCode: generateIncidentCode(),
       });
 
-      // show success message for 5 seconds
       setSuccessMessage(
         `✅ Incident ${data.incidentCode} submitted successfully. Letting Agent Has been notified for remedial action.`
       );
-      setTimeout(() => setSuccessMessage(""), 10000);
+      setTimeout(() => setSuccessMessage(""), 5000);
     }
   };
 
@@ -83,17 +81,17 @@ export default function IncidentForm({ onSubmit, initialData }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto w-full"
+      className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md max-w-2xl mx-auto w-full"
     >
       <h1 className="text-2xl mb-4 text-center">
-        <span className="text-red-700 font-bold">Flat 4</span>
+        <span className="text-red-700 dark:text-red-400 font-bold">Flat 4</span>
       </h1>
-      <h2 className="text-xl font-bold mb-4 text-center">
+      <h2 className="text-xl font-bold mb-4 text-center text-gray-900 dark:text-gray-100">
         Incident Report Form
       </h2>
 
       {successMessage && (
-        <div className="p-3 text-green-800 bg-green-100 border border-green-300 rounded">
+        <div className="p-3 text-green-800 dark:text-green-100 bg-green-100 dark:bg-green-700 border border-green-300 dark:border-green-600 rounded">
           {successMessage}
         </div>
       )}
@@ -101,7 +99,9 @@ export default function IncidentForm({ onSubmit, initialData }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {fields.map(({ name, label, type }) => (
           <div key={name} className="flex flex-col">
-            <label className="block font-medium text-sm mb-1">{label}</label>
+            <label className="block font-medium text-sm mb-1 text-gray-900 dark:text-gray-100">
+              {label}
+            </label>
             <input
               type={type}
               name={name}
@@ -118,7 +118,11 @@ export default function IncidentForm({ onSubmit, initialData }) {
                 "time",
                 "description",
               ].includes(name)}
-              className="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300"
+              className="w-full border px-3 py-2 rounded 
+                         focus:outline-none focus:ring focus:ring-blue-300
+                         bg-white dark:bg-gray-700 
+                         text-gray-900 dark:text-gray-100
+                         border-gray-300 dark:border-gray-600"
             />
           </div>
         ))}
@@ -126,7 +130,7 @@ export default function IncidentForm({ onSubmit, initialData }) {
 
       <button
         type="submit"
-        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
       >
         Submit
       </button>
